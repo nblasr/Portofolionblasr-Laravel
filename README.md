@@ -1,59 +1,100 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Analisis Penggunaan Controller pada Web Portofolio – Laravel
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Project ini merupakan web portofolio pribadi yang dibangun menggunakan framework Laravel dengan konsep MVC (Model – View – Controller). Fokus utama pada tahap ini adalah penerapan Controller untuk mengatur alur data agar struktur project menjadi lebih rapi, terorganisir, dan mudah dikembangkan.
 
-## About Laravel
+## 1. Controller yang Digunakan
+Pada project ini terdapat beberapa controller di dalam folder app/Http/Controllers, yaitu:
+- HomeController.php
+- PortfolioController.php
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+Controller tersebut berfungsi sebagai penghubung antara route (web.php) dan Blade view, serta menjadi tempat pengolahan data yang akan dikirim ke tampilan.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## 2. Fungsi Controller pada Project
+Controller memiliki beberapa fungsi utama, yaitu:
+1. Mengatur halaman yang akan ditampilkan
+2. Mengelola data statis, seperti:
+- Data diri / profil
+- Data social media
+- List skill
+- List project
+- Kontak
+3. Mengirim data ke file Blade yang ada di folder resources/views
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+Contoh data yang dikelola di dalam Controller:
 
-## Learning Laravel
+$social = [
+    'github'   => 'https://github.com/nblasr',
+    'linkedin' => 'https://linkedin.com/in/nblasr',
+    'email'    => 'mailto:nabila@example.com'
+];
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+$skills = ['HTML', 'CSS', 'JavaScript', 'PHP', 'Laravel'];
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+Data di atas kemudian dikirim ke view menggunakan kode berikut:
 
-## Laravel Sponsors
+return view('welcome', compact('social', 'skills'));
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+Dengan cara ini, file Blade tidak menyimpan data atau logika, melainkan hanya menampilkan data yang dikirim dari Controller.
 
-### Premium Partners
+## 3. Blade View yang Menerima Data dari Controller
+Controller mengirim data ke halaman utama yaitu:
+resources/views/welcome.blade.php
+File tersebut kemudian memanggil beberapa section, yaitu:
+- sections/hero.blade.php
+- sections/about.blade.php
+- sections/skills.blade.php
+- sections/projects.blade.php
+- sections/contact.blade.php
+Masing-masing section menerima dan menampilkan data yang berasal dari Controller.
+Contoh penggunaan data di dalam Blade (misalnya pada hero.blade.php):
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+<a href="{{ $social['github'] }}" target="_blank">
+    <svg>...</svg>
+</a>
 
-## Contributing
+Artinya, link GitHub tersebut tidak ditulis langsung di Blade, melainkan dikontrol sepenuhnya dari Controller.
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+## 4. Perubahan Routing (routes/web.php)
+Sebelum menggunakan Controller, halaman dipanggil langsung melalui view di route. Kemudian routing diubah menjadi menggunakan Controller sebagai berikut:
 
-## Code of Conduct
+use App\Http\Controllers\PortfolioController;
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Route::get('/', [PortfolioController::class, 'index']);
 
-## Security Vulnerabilities
+Artinya, ketika user membuka halaman utama (/), Laravel akan:
+- Masuk ke PortfolioController
+- Menjalankan function index()
+- Mengirim data ke file welcome.blade.php
+- Menampilkan halaman portofolio
+Alur ini sudah sesuai dengan standar MVC Laravel.
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## 5. Alur Kerja Controller pada Website
+Urutan kerja dalam project ini adalah:
+1. User membuka website
+2. File routes/web.php memanggil PortfolioController
+3. PortfolioController menyiapkan seluruh data portofolio
+4. Data dikirim ke welcome.blade.php
+5. welcome.blade.php menampilkan section:
+- Hero
+- About
+- Skills
+- Projects
+- Contact
 
-## License
+Setiap section menampilkan data dari Controller, bukan dari hardcode di blade.
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## 6. Keuntungan Menggunakan Controller
+Penggunaan Controller dalam project ini memberikan beberapa keuntungan:
+- Struktur project lebih rapi
+- Tampilan (Blade) terpisah dari logika
+- Lebih mudah dikembangkan di masa depan
+- Siap dihubungkan dengan database
+- Sesuai konsep MVC Laravel
+- Mudah ditambahkan fitur baru seperti admin panel atau CRUD
+Jika suatu saat project ini dikembangkan lebih lanjut, Controller yang sudah ada dapat langsung digunakan untuk mengelola data dari database.
+
+## 7. Kesimpulan
+
+Penggunaan HomeController dan PortfolioController pada web portofolio Laravel ini sangat membantu dalam mengatur alur data dan menjaga file Blade tetap bersih dari logika yang berlebihan.
+
+Dengan penerapan Controller, web portofolio ini tidak hanya berupa tampilan statis, tetapi sudah tersusun secara lebih profesional, terstruktur, dan sesuai standar pengembangan web modern menggunakan Laravel.
